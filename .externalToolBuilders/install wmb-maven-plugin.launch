@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<launchConfiguration type="org.maven.ide.eclipse.Maven2BuilderConfigurationType">
+<booleanAttribute key="editedByExternalToolsMainTab" value="true"/>
+<stringAttribute key="org.eclipse.jdt.launching.WORKING_DIRECTORY" value="${workspace_loc:/wmb-maven-plugin}"/>
+<stringAttribute key="org.eclipse.ui.externaltools.ATTR_RUN_BUILD_KINDS" value="full,incremental,auto,clean"/>
+<booleanAttribute key="org.eclipse.debug.ui.ATTR_LAUNCH_IN_BACKGROUND" value="false"/>
+<booleanAttribute key="M2_OFFLINE" value="false"/>
+<booleanAttribute key="org.eclipse.ui.externaltools.ATTR_TRIGGERS_CONFIGURED" value="true"/>
+<stringAttribute key="M2_RUNTIME" value="EMBEDDED"/>
+<booleanAttribute key="M2_UPDATE_SNAPSHOTS" value="false"/>
+<booleanAttribute key="M2_DEBUG_OUTPUT" value="false"/>
+<booleanAttribute key="org.eclipse.debug.core.appendEnvironmentVariables" value="true"/>
+<stringAttribute key="M2_GOALS_CLEAN" value="clean"/>
+<booleanAttribute key="M2_SKIP_TESTS" value="false"/>
+<booleanAttribute key="M2_WORKSPACE_RESOLUTION" value="false"/>
+<stringAttribute key="M2_GOALS_AUTO_BUILD" value="install"/>
+<stringAttribute key="M2_PROFILES" value=""/>
+<stringAttribute key="M2_GOALS_AFTER_CLEAN" value="install"/>
+<listAttribute key="M2_PROPERTIES"/>
+<stringAttribute key="M2_GOALS_MANUAL_BUILD" value="install"/>
+</launchConfiguration>

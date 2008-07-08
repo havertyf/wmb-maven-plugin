@@ -3,7 +3,7 @@ package se.slide.maven.wmb;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
-import java.io.*;
+
 
 /**
  * 
@@ -12,6 +12,13 @@ import java.io.*;
  */
 public class BuildBarMojo extends AbstractMojo {
 
+	/**
+	 * @parameter expression="${project}"
+	 * @required
+	 * @readonly
+	 */
+	private org.apache.maven.project.MavenProject project;
+	
 	public void execute() throws MojoExecutionException, MojoFailureException {
 		getLog().info("building bar..");
 		
@@ -22,7 +29,6 @@ public class BuildBarMojo extends AbstractMojo {
 			Process p = Runtime.getRuntime().exec(cmd);
 			p.waitFor();
 			getLog().info(p.exitValue() + "");
-			
 		}
 		catch (Exception error) {
 			getLog().info("Error running mqsicreatebar. Make sure mqsicreatebar.exe is in your path variables. Exception message: " + error.getMessage());

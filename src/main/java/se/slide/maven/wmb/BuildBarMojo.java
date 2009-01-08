@@ -2,8 +2,12 @@ package se.slide.maven.wmb;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -35,25 +39,27 @@ public class BuildBarMojo extends AbstractMojo {
 	/**
 	 * Base directory of the project.
 	 * 
-	 * @parameter expression="${wmbWorkspace}" default-value="src\\wmb"
+	 * @parameter expression="${wmbSourceFolder}" default-value="src\\wmb"
 	 */
-	private String wmbWorkspace;
+	private String wmbSourceFolder;
 
 	final static String TARGET_FOLDER = "target";
+	final static String WORKSPACE_NAME = "workspace";
+	
+	File workspaceFolder = null;
 
 	public void execute() throws MojoExecutionException, MojoFailureException {
 		/*
-		 * Set the workspace folder to our src\wmb folder TODO Make this a
-		 * configurable setting
+		 * TODO Make setting work for absolut pathnames as well
 		 */
-		String workspace = "." + File.separator + wmbWorkspace;
+		String wmbSrcFolder = "." + File.separator + wmbSourceFolder;
 
-		// Set up the target folder
-		createTargetFolderIfNeeded();
+		// Set up the temporary workspace
+		setupWorkspace();
 
 		// All folders in the workspace could be a project folder
 		Collection<File> projects = new ArrayList<File>();
-		for (File child : new File(workspace).listFiles()) {
+		for (File child : new File(wmbSrcFolder).listFiles()) {
 			if (child.isDirectory()) {
 				projects.add(child);
 			}
@@ -75,15 +81,23 @@ public class BuildBarMojo extends AbstractMojo {
 			if (!wmbProject.getProjectFiles().isEmpty()) {
 				getLog().info(
 						"Adding WMB project: " + wmbProject.getProjectName());
+				// Add project
 				wmbProjects.add(wmbProject);
+				// Copy project to our temp workspace
+				try {
+					copyDirectory(project, new File(workspaceFolder, wmbProject.getProjectName()));
+				}
+				catch (IOException e) {
+					throw new MojoFailureException("Cannot copy " + project.getAbsolutePath() + " to destination " + workspaceFolder.getAbsolutePath());
+				}
 			}
 		}
-
+		
 		try {
 			String command = "";
 			command += "mqsicreatebar";
 			command += " -data";
-			command += " " + workspace;
+			command += " " + workspaceFolder.getAbsolutePath();
 			command += " -cleanBuild";
 			command += " -b " + TARGET_FOLDER + File.separator
 					+ project.getArtifactId() + ".bar";
@@ -148,13 +162,57 @@ public class BuildBarMojo extends AbstractMojo {
 		return cmd_out.toString();
 	}
 
-	private void createTargetFolderIfNeeded() {
+	protected void createTargetFolderIfNeeded() {
 		File targetFolder = new File(project.getBasedir().getAbsolutePath()
 				+ File.separator + TARGET_FOLDER);
 
 		if (!targetFolder.exists()) {
 			targetFolder.mkdir();
 			getLog().info("Target folder not found, created target folder.");
+		}
+	}
+
+	protected void setupWorkspace() {
+		File workspaceFolder = new File(project.getBasedir().getAbsolutePath()
+				+ File.separator + TARGET_FOLDER + File.separator
+				+ WORKSPACE_NAME);
+
+		if (!workspaceFolder.exists()) {
+			workspaceFolder.mkdirs();
+			getLog().info(
+					"Workspace folder not found, created folder "
+							+ workspaceFolder.getAbsolutePath());
+		}
+		
+		this.workspaceFolder = workspaceFolder;
+	}
+
+	public void copyDirectory(File sourceLocation, File targetLocation)
+			throws IOException {
+
+		if (sourceLocation.isDirectory()) {
+			if (!targetLocation.exists()) {
+				targetLocation.mkdir();
+			}
+
+			String[] children = sourceLocation.list();
+			for (int i = 0; i < children.length; i++) {
+				copyDirectory(new File(sourceLocation, children[i]), new File(
+						targetLocation, children[i]));
+			}
+		} else {
+
+			InputStream in = new FileInputStream(sourceLocation);
+			OutputStream out = new FileOutputStream(targetLocation);
+
+			// Copy the bits from instream to outstream
+			byte[] buf = new byte[1024];
+			int len;
+			while ((len = in.read(buf)) > 0) {
+				out.write(buf, 0, len);
+			}
+			in.close();
+			out.close();
 		}
 	}
 }

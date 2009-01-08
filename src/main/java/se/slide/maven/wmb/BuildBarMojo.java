@@ -50,7 +50,7 @@ public class BuildBarMojo extends AbstractMojo {
 
 	public void execute() throws MojoExecutionException, MojoFailureException {
 		/*
-		 * TODO Make setting work for absolut pathnames as well
+		 * TODO Make setting work for absolute pathnames as well
 		 */
 		String wmbSrcFolder = "." + File.separator + wmbSourceFolder;
 
@@ -94,26 +94,47 @@ public class BuildBarMojo extends AbstractMojo {
 		}
 		
 		try {
-			String command = "";
-			command += "mqsicreatebar";
-			command += " -data";
-			command += " " + workspaceFolder.getAbsolutePath();
-			command += " -cleanBuild";
-			command += " -b " + TARGET_FOLDER + File.separator
-					+ project.getArtifactId() + ".bar";
+			StringBuffer command = new StringBuffer();
+			
+			command.append("mqsicreatebar");
+			command.append(" -data");
+			command.append(" ");
+			command.append(workspaceFolder.getAbsolutePath());
+			command.append(" -cleanBuild");
+			command.append(" -b ");
+			command.append(TARGET_FOLDER);
+			command.append(File.separator);
+			command.append(project.getArtifactId());
+			command.append(".bar");
+			
+			//command += " -b " + TARGET_FOLDER + File.separator + project.getArtifactId() + ".bar";
 
+			StringBuffer paramProjects = new StringBuffer();
+			StringBuffer paramFiles = new StringBuffer();
+			
 			for (WmbProject wmbProject : wmbProjects) {
-				command += " -p " + wmbProject.getProjectName();
+				//command += " -p " + wmbProject.getProjectName();
+				paramProjects.append(" ");
+				paramProjects.append(wmbProject.getProjectName());
 				for (String filename : wmbProject.getProjectFiles()) {
-					command += " -o " + wmbProject.getProjectName() + "\\"
-							+ filename;
+					paramFiles.append(" ");
+					paramFiles.append(wmbProject.getProjectName());
+					paramFiles.append("\\");
+					paramFiles.append(filename);
+					
+					//command += " -o " + wmbProject.getProjectName() + "\\" + filename;
 				}
 			}
 
-			getLog().info("Executing command: " + command);
+			command.append(" -p");
+			command.append(paramProjects.toString());
+			command.append(" -o");
+			command.append(paramFiles.toString());
+			
+			getLog().info("Executing command: " + command.toString());
 
 			Runtime rt = Runtime.getRuntime();
-			Process process = rt.exec(command);
+			Process process = rt.exec(command.toString());
 
 			int exitVal = process.waitFor();
 
@@ -160,16 +181,6 @@ public class BuildBarMojo extends AbstractMojo {
 			}
 		}
 		return cmd_out.toString();
-	}
-
-	protected void createTargetFolderIfNeeded() {
-		File targetFolder = new File(project.getBasedir().getAbsolutePath()
-				+ File.separator + TARGET_FOLDER);
-
-		if (!targetFolder.exists()) {
-			targetFolder.mkdir();
-			getLog().info("Target folder not found, created target folder.");
-		}
 	}
 
 	protected void setupWorkspace() {

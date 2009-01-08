@@ -25,6 +25,21 @@
       <version>2.0.1</version>
       <type>maven-plugin</type>
     </dependency>
+    <dependency>
+    	<groupId>org.codehaus.plexus</groupId>
+    	<artifactId>plexus-archiver</artifactId>
+    	<version>1.0-alpha-9</version>
+    	<exclusions>
+    		<exclusion>
+    			<artifactId>plexus-container-default</artifactId>
+    			<groupId>org.codehaus.plexus</groupId>
+    		</exclusion>
+    		<exclusion>
+    			<artifactId>plexus-component-api</artifactId>
+    			<groupId>org.codehaus.plexus</groupId>
+    		</exclusion>
+    	</exclusions>
+    </dependency>
   </dependencies>
   <scm>
     <developerConnection>scm:svn:${scm.url}</developerConnection>
